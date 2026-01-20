@@ -14,19 +14,21 @@ PROMO_CODE = "UXQ1WIN"
 
 @bot.message_handler(func=lambda message: message.text.lower() in ['/start', 'hy', 'hi', 'hello'])
 def send_welcome(message):
+    # सिंपल टेक्स्ट (बिना Markdown के) ताकि कोई एरर न आए
     response_text = (
-        f"🚀 **Welcome to 1win!** 🚀\n\n"
-        f"💰 **Register Now & Win Big:**\n"
+        "🚀 Welcome to 1win! 🚀\n\n"
+        "💰 Register Now & Win Big:\n"
         f"👉 {REFERRAL_LINK}\n\n"
-        f"🔥 **Use Promo Code:** `{PROMO_CODE}`\n"
-        f"(Click to copy code)"
+        f"🔥 Use Promo Code: {PROMO_CODE}\n"
+        "(Click to copy code)"
     )
     
     markup = telebot.types.InlineKeyboardMarkup()
     btn_link = telebot.types.InlineKeyboardButton("🔗 Register Here", url=REFERRAL_LINK)
     markup.add(btn_link)
 
-    bot.reply_to(message, response_text, parse_mode='Markdown', reply_markup=markup)
+    # यहाँ हमने parse_mode हटा दिया है
+    bot.reply_to(message, response_text, reply_markup=markup)
 
 @server.route('/' + API_TOKEN, methods=['POST'])
 def getMessage():
@@ -38,7 +40,6 @@ def getMessage():
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    # FIX: यहाँ हमने 'http' को 'https' में बदल दिया है ताकि Telegram को सही लिंक मिले
     current_url = request.host_url.replace('http://', 'https://')
     bot.set_webhook(url=current_url + API_TOKEN)
     return "<h1>Bot is Active! Webhook Set Successfully (HTTPS).</h1>", 200
