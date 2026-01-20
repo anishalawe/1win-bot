@@ -12,23 +12,16 @@ server = Flask(__name__)
 REFERRAL_LINK = "https://1wkaws.com/?p=3l7z"
 PROMO_CODE = "UXQ1WIN"
 
-@bot.message_handler(func=lambda message: message.text.lower() in ['/start', 'hy', 'hi', 'hello'])
-def send_welcome(message):
-    # सिंपल टेक्स्ट (बिना Markdown के) ताकि कोई एरर न आए
-    response_text = (
-        "🚀 Welcome to 1win! 🚀\n\n"
-        "💰 Register Now & Win Big:\n"
-        f"👉 {REFERRAL_LINK}\n\n"
-        f"🔥 Use Promo Code: {PROMO_CODE}\n"
-        "(Click to copy code)"
-    )
-    
-    markup = telebot.types.InlineKeyboardMarkup()
-    btn_link = telebot.types.InlineKeyboardButton("🔗 Register Here", url=REFERRAL_LINK)
-    markup.add(btn_link)
-
-    # यहाँ हमने parse_mode हटा दिया है
-    bot.reply_to(message, response_text, reply_markup=markup)
+# DEBUG: यह हर तरह के मैसेज का रिप्लाई करेगा
+@bot.message_handler(func=lambda message: True)
+def echo_all(message):
+    print(f"DEBUG: Message received from {message.from_user.first_name}: {message.text}")
+    try:
+        # हम जानबूझकर बिना डिज़ाइन के मैसेज भेज रहे हैं ताकि कोई एरर न आए
+        bot.reply_to(message, f"Test Successful!\nLink: {REFERRAL_LINK}\nCode: {PROMO_CODE}")
+        print("DEBUG: Reply sent successfully!")
+    except Exception as e:
+        print(f"DEBUG: Error sending message: {e}")
 
 @server.route('/' + API_TOKEN, methods=['POST'])
 def getMessage():
@@ -42,7 +35,7 @@ def webhook():
     bot.remove_webhook()
     current_url = request.host_url.replace('http://', 'https://')
     bot.set_webhook(url=current_url + API_TOKEN)
-    return "<h1>Bot is Active! Webhook Set Successfully (HTTPS).</h1>", 200
+    return f"<h1>Bot Updated. Webhook set to: {current_url + API_TOKEN}</h1>", 200
 
 if __name__ == "__main__":
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
