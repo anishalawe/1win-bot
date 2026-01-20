@@ -12,7 +12,6 @@ server = Flask(__name__)
 REFERRAL_LINK = "https://1wkaws.com/?p=3l7z"
 PROMO_CODE = "UXQ1WIN"
 
-# जब कोई यूजर मैसेज भेजता है (Start या Hi)
 @bot.message_handler(func=lambda message: message.text.lower() in ['/start', 'hy', 'hi', 'hello'])
 def send_welcome(message):
     response_text = (
@@ -29,7 +28,6 @@ def send_welcome(message):
 
     bot.reply_to(message, response_text, parse_mode='Markdown', reply_markup=markup)
 
-# यह कोड टेलीग्राम से मैसेज रिसीव करेगा (Webhook)
 @server.route('/' + API_TOKEN, methods=['POST'])
 def getMessage():
     json_string = request.get_data().decode('utf-8')
@@ -37,13 +35,13 @@ def getMessage():
     bot.process_new_updates([update])
     return "!", 200
 
-# यह सबसे जरूरी पार्ट है: यह बॉट को इंटरनेट से कनेक्ट करेगा
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    # Render का URL अपने आप सेट हो जाएगा
-    bot.set_webhook(url=request.host_url + API_TOKEN)
-    return "<h1>Bot is Active! Webhook Set Successfully.</h1>", 200
+    # FIX: यहाँ हमने 'http' को 'https' में बदल दिया है ताकि Telegram को सही लिंक मिले
+    current_url = request.host_url.replace('http://', 'https://')
+    bot.set_webhook(url=current_url + API_TOKEN)
+    return "<h1>Bot is Active! Webhook Set Successfully (HTTPS).</h1>", 200
 
 if __name__ == "__main__":
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
